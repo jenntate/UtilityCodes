@@ -1,0 +1,26 @@
+# integer number ot time steps to chop (e.g. "9")
+fname.3dbin
+fname.sol
+fname_chop.bin
+fname_chop_h.sol
+fname_chop_s.sol
+# integer constituent specifier: 1=salt, 2=temp, 3=sed  (e.g. "3")
+fname_chop.sumprt
+fname_chop.geo
+# integer number of corner+midside nodes in a string (e.g. "53") Sample node list follows
+6  312 17 339 
+28 360 39 381 
+50 402 61 423 
+72 444 83 465 
+94 486 105 506 
+116 527 127 549 
+138 570 149 591 
+160 611 171 633 
+182 653 193 675 
+204 696 215 717 
+226 737 237 758 
+248 779 259 801 
+270 821 281 824 
+292    
+# integer z-magnification (e.g. "10")
+0

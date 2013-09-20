@@ -1,0 +1,52 @@
+
+r10wes_chopit_v2.f       -    This code generates a solution file of a vertical section of
+                              the 3-D solution. For viewing in SMS
+
+r10wes_slice_bv21.f      -    This code generates a solution file of a horizontal section
+                              of the 3-D solution which consists of the results at the bottom 
+                              nodes.  For viewing in SMS.
+
+r10wes_slice_sv21.f      -    This code generates a solution file of a horizontal section
+                              of the 3-D solution which consists of the results at the surface 
+                              nodes.  For viewing in SMS.
+
+r10wes_slicev12.f        -    This code generates a solution file of a horizontal section
+                              of the 3-D solution which consists of the results at any user 
+                              specified depth.  For viewing in SMS.
+
+r10wes_rma102gms.f       -    This code converts RMA10 solution and 3-D geometry files into
+                              ASCII files which can be viewed in GMS.
+
+r10wes_r2_r10_hotstart.f -    This code converts a RMA2 hotstart file into a RMA10 hotstart
+                              file.
+
+r10wes_r4icr10.f         -    This code converts a RMA4 hotstart file into a RMA10 hotstart 
+                              file.
+
+node10get.f              -    This code extracts velocity, water surface elevation, and
+                              constituent concentration data at selected nodes from a
+                              RMA10 solution file.
+
+mergave429.f             -    This code merges up to 3 RMA10 solution files into 1
+                              solution file.  It will also average the values of each
+                              DOF for a specified time series on a solution file and
+                              write the results as a soltion file with 1 time step
+                              consisting of the averaged values.
+
+extract_flow_or_sflux_record.f  -  This code extracts a time-history of flow or 
+                                   constituent flux for flow across a user specified 
+                                   continuity line.  The data is extracted from either
+                                   the flow_record file (for flow data) or the 
+                                   sflux_record file (for constituent flux data).
+                                   The flow_record file and sflux_record file are 
+                                   standard RMA10 output files.
+
+convrt_bc.f              -    This file converts a RMA10 bc file given in English
+                              units to metric units.  NOTE:  not all the input cards
+                              are converted at this time.  A list of the cards that
+                              are converted is written to the screen when you execute
+                              convrt_bc.
+
+grab_r10sol_chunk.f      -    This file selects a user specified chunk of an RMA10
+                              solution file and writes it to another file (specified
+                              by the user).
