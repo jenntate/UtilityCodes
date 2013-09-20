@@ -1,0 +1,591 @@
+function combine_da_files(basename,newname,attributes,...
+    start_time,stop_time)
+%
+%
+%    Subroutine to combine multiple da files into a single file with data
+%    from the start_time value to the stop_time value.  The new da file
+%    will be named according to the newname variable.
+%
+%    Input variables:
+%
+%       basename = structure array with the names of the da files to be
+%                  combined. (Example would be basename{1}='test1'; 
+%                  basename{2}='test2'
+%                  .
+%                  .
+%                  etc.
+%
+%       newname = basename for the da file that will be created as output
+%
+%       attributes = string containing the parameters to be included in the da
+%                    file seperated by spaces.  These are:
+%
+%                    dep = depth solution
+%                    wse = water surface elevation solution
+%                    vel = velocity vector and magnitude solution
+%                    sal = salinity solution
+%                    vor = vorticity solution
+%                    snd = sand concentration solution
+%                    cla = silt concentration solution
+%                    err = error solution
+%                    dpl = bed displacement solution
+%                    alt = active layer thickness
+%                    ald = active layer distribution
+%                    blt = bed layer thickness
+%                    bld = bed layer distribution
+%                    cbp = cohesive bed properties
+%                    bsh = bed shear stress solution
+%                    bed = bedload vector and magnitude solution
+%                    smr = sediment mass residual
+%
+%       start_time = string variable of the desired start time for the
+%                    newly created da file. 
+%                    (Example = '01/01/2008 00:00:00')
+%
+%       stop_time = string variable of the desired stop time for the
+%                    newly created da file. 
+%                    (Example = '01/01/2009 00:00:00')
+%
+%       Output:
+%
+%       A da file will be created that combines the individual da files
+%       from the basename structure that will have data starting no earlier
+%       than start_time and extending not past stop_time
+%
+%       Example Usage:
+%
+%       basename{1}='run1';
+%       basename{2}='run2';
+%       combine_da_files(basename,'combined_da_file.da','dep
+%       sal','01/01/2008 00:00:00','01/01/2009 00:00:00')
+%
+%       This will combined the run1.da and run2.da files keeping only data
+%       between 01/01/2008 and 01/01/2009 for depth and salinity
+%
+%
+
+
+
+%% used to determine time for code execution
+
+tic
+
+%% convert the start and stop times to serial date format
+
+start_time=datenum(start_time);
+stop_time=datenum(stop_time);
+
+%% determines the number of da files to combine for future loops
+
+len=length(basename);
+
+%% reads the header information for all da files
+
+check=cell(len);
+
+for r=1:len
+  check{r}=load_da_stepnew([basename{r} '.da'], 0);
+end
+
+%% checks to verify that all da sets have the same number of nodes
+
+for r=1:len-1
+  if(check{r}.np ~= check{r+1}.np)
+      fprintf(1,'\nERROR TWO SOLUTIONS DO NOT CONTAIN THE SAME NUMBER OF NODES\n\n');
+      stop
+  end
+end
+
+dep_check=0;
+wse_check=0;
+vel_check=0;
+err_check=0;
+sal_check=0;
+vor_check=0;
+snd_check=0;
+slt_check=0;
+smr_check=0;
+dpl_check=0;
+bsh_check=0;
+blt_check=0;
+bld_check=0;
+bed_check=0;
+alt_check=0;
+alb_check=0;
+cbp_check=0;
+number_layers=0;
+number_sed=0;
+
+%% checks the input attributes to and that those attributes are in the da
+% files
+
+temp1=sscanf(attributes,'%s');
+for i=1:length(temp1)/3
+   test=temp1((1+(i-1)*3):3*i);
+   switch lower(test)
+       
+       % checks the dep
+       
+       case {'dep'}
+           dep_check=check{1}.dep_check;
+           for r=1:len
+               if(check{r}.dep_check < 1)
+                 fprintf(1,'\nAttribute %s does not exist in %s.da\n\n',...
+                     'dep',basename{r});
+                 stop
+               end
+           end
+           
+       % checks the wse    
+           
+       case {'wse'}
+           wse_check=check{1}.wse_check;
+           for r=1:len
+             if(check{r}.wse_check < 1)
+                 fprintf(1,'\nAttribute %s does not exist in %s.da\n\n',...
+                     'wse',basename{r});
+                 stop
+             end
+           end          
+           
+       % checks the velocity    
+           
+       case {'vel'}
+           vel_check=check{1}.vel_check;
+           for r=1:len
+             if(check{r}.vel_check < 1)
+                 fprintf(1,'\nAttribute %s does not exist in %s.da\n\n',...
+                     'vel',basename{r});
+                 stop
+             end
+           end        
+           
+       % checks the error    
+           
+       case {'err'}
+           err_check=check{1}.err_check;
+           for r=1:len
+             if(check{r}.err_check < 1)
+                 fprintf(1,'\nAttribute %s does not exist in %s.da\n\n',...
+                     'err',basename{r});
+                 stop
+             end
+           end            
+           
+       % checks the salinity    
+           
+       case {'sal'}
+           sal_check=check{1}.sal_check;
+           for r=1:len
+             if(check{r}.sal_check < 1)
+                 fprintf(1,'\nAttribute %s does not exist in %s.da\n\n',...
+                     'sal',basename{r});
+                 stop
+             end
+           end         
+           
+       % checks the vorticity    
+           
+       case {'vor'}
+           vor_check=check{1}.vor_check;
+           for r=1:len
+             if(check{r}.vor_check < 1)
+                   fprintf(1,'\nAttribute %s does not exist in %s.da\n\n',...
+                       'vor',basename{r});
+                   stop
+             end   
+           end
+           
+       % checks the sand    
+           
+       case {'snd'}
+           snd_check=check{1}.snd_check;
+           for r=1:len
+             if(check{r}.snd_check < 1)
+                 fprintf(1,'\nAttribute %s does not exist in %s.da\n\n',...
+                     'snd',basename{r});
+                 stop
+             end
+           end
+           for r=1:len-1
+             if(check{r}.snd_check ~= check{r+1}.snd_check)
+                 fprintf(1,'\nNumber of Sands do not match in da files %s and %s\n\n', ...
+                     basename{r},basename{r+1});
+                 stop
+             end
+           end
+           
+       % checks the silts    
+           
+       case {'cla'}
+           slt_check=check{1}.slt_check;
+           for r=1:len
+             if(check{r}.slt_check < 1)
+                 fprintf(1,'\nAttribute %s does not exist in %s.da\n\n',...
+                     'slt',basename{r});
+                 stop
+             end
+           end  
+           for r=1:len-1
+             if(check{r}.slt_check ~= check{r+1}.slt_check)
+                 fprintf(1,'\nNumber of Clays do not match in da files %s and %s\n\n', ...
+                     basename{r},basename{r+1});
+                 stop
+             end
+           end
+           
+       % checks the bed load transport    
+           
+       case {'blt'}
+           blt_check=check{1}.blt_check;
+           for r=1:len
+             if(check{r}.blt_check < 1)
+                 fprintf(1,'\nAttribute %s does not exist in %s.da\n\n',...
+                     'blt',basename{r});
+                 stop
+             end
+           end          
+           
+       % checks the bed load displacement    
+           
+       case {'bld'}
+           bld_check=check{1}.bld_check;
+           for r=1:len
+             if(check{r}.bld_check < 1)
+                 fprintf(1,'\nAttribute %s does not exist in %s.da\n\n',...
+                     'bld',basename{r});
+                 stop
+             end
+           end           
+           
+       % checks the smr    
+           
+       case {'smr'}
+           smr_check=check{1}.smr_check;
+           for r=1:len
+             if(check{r}.smr_check < 1)
+                 fprintf(1,'\nAttribute %s does not exist in %s.da\n\n',...
+                     'smr',basename{r});
+                 stop
+             end
+           end             
+           
+       % checks the bed displacement    
+           
+       case {'dpl'}
+           dpl_check=check{1}.dpl_check;
+           for r=1:len
+             if(check{r}.dpl_check < 1)
+                 fprintf(1,'\nAttribute %s does not exist in %s.da\n\n',...
+                     'dpl',basename{r});
+                 stop
+             end
+           end         
+           
+       % checks the bed shear    
+           
+       case {'bsh'}
+           bsh_check=check{1}.bsh_check;
+           for r=1:len
+             if(check{r}.bsh_check < 1)
+                 fprintf(1,'\nAttribute %s does not exist in %s.da\n\n',...
+                     'bsh',basename{r});
+                 stop
+             end
+           end         
+           
+       % checks the bed vector    
+           
+       case {'bed'}
+           bed_check=check{1}.bed_check;
+           for r=1:len
+             if(check{r}.bed_check < 1)
+                 fprintf(1,'\nAttribute %s does not exist in %s.da\n\n',...
+                     'bed',basename{r});
+                 stop
+             end
+           end         
+           
+       % checks the cbp    
+           
+       case {'cbp'}
+           cbp_check=check{1}.cbp_check;
+           for r=1:len
+             if(check{r}.cbp_check < 1)
+                 fprintf(1,'\nAttribute %s does not exist in %s.da\n\n',...
+                     'cbp',basename{r});
+                 stop
+             end
+           end         
+           
+       % checks the alt    
+           
+       case {'alt'}
+           alt_check=check{1}.alt_check;
+           for r=1:len
+             if(check{r}.alt_check < 1)
+                 fprintf(1,'\nAttribute %s does not exist in %s.da\n\n',...
+                     'alt',basename{r});
+                 stop
+             end
+           end             
+           
+       % checks the alb    
+           
+       case {'alb'}
+           alb_check=check{1}.alb_check;
+           for r=1:len
+             if(check{r}.alb_check < 1)
+                 fprintf(1,'\nAttribute %s does not exist in %s.da\n\n',...
+                     'alb',basename{r});
+                 stop
+             end
+           end         
+     
+       otherwise
+           fprintf(1,'\nAttribute not recognized %s\n\n',test);
+   end
+end
+
+%% opens the new da file
+
+fid=fopen([newname,'.da'],'wb','n');
+
+fprintf(1,'WRITING da FILE\n');
+
+nt=0;
+dt=0;
+
+%% write the da file header information (number of time steps, nodes, and
+%  time step size)
+
+fwrite(fid,nt,'integer*4');
+fwrite(fid,check{1}.np,'integer*4');
+fwrite(fid,dt,'real*4');
+fwrite(fid,dep_check,'integer*4');
+fwrite(fid,wse_check,'integer*4');
+fwrite(fid,vel_check,'integer*4');
+fwrite(fid,err_check,'integer*4');
+fwrite(fid,sal_check,'integer*4');
+fwrite(fid,vor_check,'integer*4');
+fwrite(fid,snd_check,'integer*4');
+fwrite(fid,slt_check,'integer*4');
+fwrite(fid,smr_check,'integer*4');
+fwrite(fid,dpl_check,'integer*4');
+fwrite(fid,bsh_check,'integer*4');
+fwrite(fid,blt_check,'integer*4');
+fwrite(fid,bld_check,'integer*4');
+fwrite(fid,bed_check,'integer*4');
+fwrite(fid,alt_check,'integer*4');
+fwrite(fid,alb_check,'integer*4');
+fwrite(fid,cbp_check,'integer*4');
+fwrite(fid,number_layers,'integer*4');
+fwrite(fid,number_sed,'integer*4');
+
+%% sets the initial last_time to start_time
+
+last_time = start_time - 1;
+
+%% Loop over all the time steps in the da files
+
+count=0;
+time_count=0.0;
+
+for r=1:length(basename)
+    
+  % loop over all the time steps in the rth da file  
+    
+  one=load_da_stepnew([basename{r} '.da'], 1);
+  two=load_da_stepnew([basename{r} '.da'],one.nt);
+  
+  if(~(two.time < start_time) && ~(one.time > stop_time))
+
+    for j=1:check{r}.nt
+      
+      % read the information for the jth time step of the rth da file
+      
+      base1_check=load_da_stepnew([basename{r} '.da'], j);    
+      
+      % if statement to check that the time isn't before start_time and
+      % also checks when a second da file starts not to save overlapping
+      % time steps by checking the last_time 
+      
+%      if(base1_check.time > stop_time)
+%          break
+%      end
+      
+      if(base1_check.time >= start_time && base1_check.time > last_time)
+          
+        % if statement to determine when/if the stop_time has been reached  
+          
+        if(base1_check.time > stop_time)
+            fprintf(1,'Stop time has been reached\n');
+            break
+        end
+        
+        count=count+1;
+        time_count=time_count+base1_check.time-last_time;
+        
+        % writes the time information to the da file
+        
+        fwrite(fid,base1_check.time,'float64');         %time
+        
+        % sets the last time step
+        
+        last_time=base1_check.time;
+        
+        % writes the dep information
+        
+        if(dep_check > 0)
+            fwrite(fid,base1_check.dep(:),'float32');
+        end
+        
+        % writes the wse information
+        
+        if(wse_check > 0)
+            fwrite(fid,base1_check.wse(:),'float32');
+        end
+        
+        % writes the velocity information
+        
+        if(vel_check > 0)       
+            fwrite(fid,base1_check.u(:),'float32');                %all u
+            fwrite(fid,base1_check.v(:),'float32');                %all v 
+        end
+        
+        % writes the error information
+        
+        if(err_check > 0)      
+            fwrite(fid,base1_check.err(:),'float32');
+        end
+        
+        % writes the salinity information
+        
+        if(sal_check > 0)
+            fwrite(fid,base1_check.sal(:),'float32');
+        end
+        
+        % writes the vorticity information
+        
+        if(vor_check > 0)  
+            fwrite(fid,base1_check.vor(:),'float32');
+        end    
+        
+        % writes the sand information
+        
+        if(snd_check > 0) 
+            for i=1:snd_check
+              fwrite(fid,base1_check.snd(i,:),'float32');
+              fwrite(fid,base1_check.snd_rouse(i,:),'float32');
+              fwrite(fid,base1_check.snd_bdma(i,:),'float32');
+            end
+        end
+        
+        % writes the silt information
+        
+        if(slt_check > 0) 
+            for i=1:slt_check
+              fwrite(fid,base1_check.slt(i,:),'float32');
+              fwrite(fid,base1_check.slt_rouse(i,:),'float32');
+              fwrite(fid,base1_check.slt_bdma(i,:),'float32');
+            end
+        end    
+        
+        % writes the smr information
+        
+        if(smr_check > 0)  
+           for i=1:base1_check.number_sed
+             fwrite(fid,base1_check.smr(i,:),'float32');
+           end
+        end
+        
+        % writes the diplacement information
+        
+        if(dpl_check > 0) 
+            fwrite(fid,base1_check.dpl(:),'float32');
+        end
+        
+        % writes the bed shear information
+        
+        if(bsh_check > 0) 
+            fwrite(fid,base1_check.bsh(:),'float32');
+        end
+        
+        % writes the bed load transport information
+        
+        if(blt_check > 0)
+            for i=1:blt_check
+              fwrite(fid,base1_check.blt(i,:),'float32');
+            end
+        end
+        
+        % writes the bed load displacement information
+        
+        if(bld_check > 0)
+            for i=1:bld_check
+              for k=1:base1_check.number_sed
+                fwrite(fid,base1_check.bld(i,k,:),'float32');
+              end
+            end
+        end
+        
+        % writes the bed vector information
+        
+        if(bed_check > 0)    
+            fwrite(fid,base1_check.bed_u(1,:),'float32');
+            fwrite(fid,base1_check.bed_v(1,:),'float32');
+        end
+        
+        % writes the alt information
+        
+        if(alt_check > 0)
+            fwrite(fid,base1_check.alt(:),'float32');
+        end
+        
+        % writes alb information
+        
+        if(alb_check > 0)  
+            for i=1:number_sed
+              fwrite(fid,base1_check.alb(i,:),'float32');
+            end
+        end
+        
+        % writes the cbp information
+        
+        if(cbp_check > 0) 
+            for i=1:cbp_check
+              fwrite(fid,base1_check.cbp_den(i,:),'float32');
+              fwrite(fid,base1_check.cbp_ces(i,:),'float32');
+              fwrite(fid,base1_check.cbp_erc(i,:),'float32');
+              fwrite(fid,base1_check.cbp_ere(i,:),'float32');
+            end
+        end     
+      end
+      if(base1_check.time > stop_time)
+        fprintf(1,'Reached Stop Time of %s\n',datestr(base1_check.time));
+        break
+      end
+    end
+  end
+end
+
+frewind(fid);
+fwrite(fid,count,'integer*4');
+fwrite(fid,check{1}.np,'integer*4');
+fwrite(fid,time_count/count,'real*4');
+
+% closes the new da file
+
+fclose(fid);
+
+fprintf(1,'Solution da files have been combined\n');
+
+toc
+
+
+
+
+
+
+
+

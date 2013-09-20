@@ -1,0 +1,48 @@
+Mile_Hammock_Bay_2012.mat
+
+Reading time series data for node 9509
+Root Mean Square Error          =  0.09
+Normalized Root Mean Square Error =  0.41
+Nash-Sutcliffe Coefficient      =  0.83
+Willmott Coefficient            =  0.95
+Covariance                      =  0.05
+Correlation Coefficient         =  0.92
+Standard Deviation (Field Data) =  0.23
+Standard Deviation (Model Data) =  0.22
+Variance (Field Data)           =  0.05
+Variance (Model Data)           =  0.05
+Mean (Field Data)               = -0.02
+Mean (Model Data)               =  0.01
+Median (Field Data)             = -0.02
+Median (Model Data)             =  0.00
+Max (Field Data)                =  0.75
+Max (Model Data)                =  1.72
+Min (Field Data)                = -0.63
+Min (Model Data)                = -0.60
+The field was shifted down by  0.00 (negative value means upward shift)
+
+
+Wallace_Creek_2012.mat
+
+Reading time series data for node 22016
+Root Mean Square Error          =  0.06
+Normalized Root Mean Square Error =  0.41
+Nash-Sutcliffe Coefficient      =  0.83
+Willmott Coefficient            =  0.96
+Covariance                      =  0.02
+Correlation Coefficient         =  0.94
+Standard Deviation (Field Data) =  0.15
+Standard Deviation (Model Data) =  0.15
+Variance (Field Data)           =  0.02
+Variance (Model Data)           =  0.02
+Mean (Field Data)               =  0.05
+Mean (Model Data)               =  0.02
+Median (Field Data)             =  0.05
+Median (Model Data)             =  0.02
+Max (Field Data)                =  0.45
+Max (Model Data)                =  0.47
+Min (Field Data)                = -0.39
+Min (Model Data)                = -0.44
+The field was shifted down by  0.00 (negative value means upward shift)
+
+
